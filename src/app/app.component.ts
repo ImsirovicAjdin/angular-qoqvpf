@@ -7,7 +7,7 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/observable/merge';
 import 'rxjs/add/operator/startWith';
 import 'rxjs/add/operator/scan'; 
-import 'rxjs/add/operator/mapTo'; // (3) so let's import mapTo
+import 'rxjs/add/operator/mapTo';
 import {Subject} from 'rxjs/Subject';
 
 @Component({
@@ -22,15 +22,24 @@ export class AppComponent  {
   clock;
 
   constructor() {
-    this.clock = Observable.merge( // (5) because either s or H are the things being pushed thru in this merged {O}
-      this.click$.mapTo('hour'),              // (2) when this pushes through it'll update an entire hour
-      Observable.interval(1000).mapTo('second') // (1) when this pushes through it'll update only 1 second
+    this.clock = Observable.merge(
+      this.click$.mapTo('hour'),
+      Observable.interval(1000).mapTo('second')
     )
       .startWith(new Date())
-      .scan((acc, curr)=> { // (4) so now what comes through in this current is either second or hour
+      .scan((acc, curr)=> {
         const date = new Date(acc.getTime());
 
-        date.setSeconds(date.getSeconds() + 1);
+        if(curr === 'second'){ // if curr is s, update the seconds
+          date.setSeconds(date.getSeconds() + 1);
+        }
+
+        if(curr === 'hour'){ // if curr is H, update the hours
+          date.setHours(date.getHours() + 1);
+        }
+        
+
+        
 
         return date;
       })
