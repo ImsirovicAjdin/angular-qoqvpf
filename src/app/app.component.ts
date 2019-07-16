@@ -1,4 +1,4 @@
-// 6 Map streams to values to affect state
+// 7 Use ngrx/store and Reducers for Angular Application State
 
 import { Component } from '@angular/core';
 import {Observable} from 'rxjs/Observable';
@@ -22,26 +22,31 @@ export class AppComponent  {
   clock;
 
   constructor() {
+    /* (3) start */
     this.clock = Observable.merge(
       this.click$.mapTo('hour'),
       Observable.interval(1000).mapTo('second')
-    )
-      .startWith(new Date())
+    ) /* (3) end*/
+      .startWith(new Date()) // (1) an initial value of new Date
+      /* (2) start */
       .scan((acc, curr)=> {
         const date = new Date(acc.getTime());
 
-        if(curr === 'second'){ // if curr is s, update the seconds
+        if(curr === 'second'){
           date.setSeconds(date.getSeconds() + 1);
         }
 
-        if(curr === 'hour'){ // if curr is H, update the hours
+        if(curr === 'hour'){
           date.setHours(date.getHours() + 1);
         }
-        
-
-        
 
         return date;
-      })
+      }) /* (2) end */
   }
 }
+/*
+What we've done here with .startWith and .scan is actually a very common pattern:
+(1) we have an initial value
+(2) we wanna change the value 
+(3) based on some other values that come through
+*/
